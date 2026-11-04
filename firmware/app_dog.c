@@ -15,7 +15,7 @@ static void cmd_thread_entry(void *arg)
         while (uart_cmd_poll(&ch)) {
             rt_mb_send(g_mb, (rt_ubase_t)(rt_uint8_t)ch);
         }
-        rt_thread_mdelay(5);
+        rt_thread_mdelay(1);
     }
 }
 
