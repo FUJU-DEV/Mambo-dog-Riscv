@@ -1,74 +1,106 @@
-# 曼波小狗 · Mambo Puppy (CH32V307 + RT-Thread 纯离线版)
+# 曼波小狗 · CH32V303CBT6 + RT-Thread（纯离线版）
 
-桌面四足机器狗「曼波小狗」的 CH32V307 纯离线改造：主控由 STM32F103C8T6 替换为国产 **RISC-V** 芯片 **CH32V307RCT6**，固件由裸机移植到 **RT-Thread**，**纯离线**运行（无 WiFi、无云端 AI），通过 **ASRPRO 离线语音模块** 控制 4 个舵机与 OLED 表情。
+桌面四足机器狗「曼波小狗」的国产 RISC-V 改造：主控由 **STM32F103C8T6** 直接换成 **CH32V303CBT6**
+（青稞 RISC-V V4F，144MHz，128KB Flash / 32KB SRAM，**LQFP-48 与原芯片同脚位**），固件从裸机移植到
+**RT-Thread**，**纯离线**运行（无 WiFi、无蓝牙、无云端 AI），通过 **ASRPRO 离线语音模块** 控制
+**4 个 SG90 舵机** 与 **0.96 英寸 OLED** 表情。
+
+> ⚡ **核心结论：原板无需改板、无需转接板 —— 焊下 STM32F103C8T6，原焊盘直接焊上 CH32V303CBT6，引脚 1 对引脚 1。**
 
 ## ✨ 特性
 
-- **RISC-V 主控 144MHz**：CH32V307RCT6（青稞 V4F，144MHz / 256KB Flash / 64KB RAM，LQFP64）
+- **RISC-V 144MHz 主控**：CH32V303CBT6（青稞 V4F / 144MHz / 128KB Flash / 32KB SRAM / LQFP-48）
+- **LQFP-48 同脚位直插**：引脚编号与 STM32F103C8T6 **完全一致**，原板不用改板、不用转接板
 - **纯离线**：无 WiFi、无蓝牙、无云端；语音识别与录音播放全部由 ASRPRO 离线模块完成
-- **ASRPRO 语音**：单字符命令协议，支持语音唤醒（识别 + 录音播放）
-- **4 × SG90 舵机**：TIM3 四路 50Hz PWM，前进 / 后退 / 转弯 / 跳舞 / 伸懒腰等全套步态
-- **OLED 表情**：0.96" SSD1306（软件 I2C，地址 0x78），实时显示心情 / 体力值
-- **RT-Thread**：cmd / action 双线程 + 邮箱，动作逻辑 100% 移植自原 manbo-robot-dog
+- **ASRPRO 语音**：单字符命令协议（USART3，9600），支持语音唤醒
+- **4 × SG90 舵机**：TIM3 四路 50Hz PWM（PA6 / PA7 / PB0 / PB1）
+- **OLED 表情**：0.96" SSD1306（PB8 / PB9 软件 I2C，地址 0x78），实时显示心情 / 体力值
+- **RT-Thread**：cmd / action 双线程 + 邮箱；动作逻辑 100% 移植自原版 manbo-robot-dog
+
+## 🔄 主控替换说明
+
+| 项目 | 原 STM32F103C8T6 | 新 CH32V303CBT6 |
+|---|---|---|
+| 内核 | ARM Cortex-M3 | 青稞 RISC-V V4F |
+| 主频 | 72 MHz | 144 MHz |
+| Flash | 64 KB | 128 KB |
+| SRAM | 20 KB | 32 KB |
+| 封装 | LQFP-48 (7×7) | LQFP-48 (7×7)，引脚编号与 F103 完全一致 |
+| 串口 | USART1/2/3 | USART1/2/3 + UART4/5 等 |
+| 定时器 | TIM1-4 | TIM1-4（高级 + 通用）|
+| 网络 | — | 纯离线，无 WiFi 无云 |
+| LCSC 编号 | C8734 | C7494374 |
+
+**结论：CH32V303CBT6 是 LQFP-48，且引脚编号与 STM32F103C8T6 完全相同**（PA6=16、PA7=17、PB0=18、
+PB1=19、PB2=20、PB10=21、PB11=22、VSS=23、VDD=24、PB12=25…PB15=28、PA8=29…PA11=32、PA12=33、
+PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8=45、PB9=46、VSS=47、VDD=48）。
+
+- **原板无需改板、无需转接板，引脚 1 对引脚 1** —— 原板 U6 焊盘直接焊接即可。
+- 原板晶振、电源、充电、舵机 / OLED / ASR 外设电路**全部不动**；固件使用的引脚与外设与原版完全一致。
 
 ## 🔌 硬件接线表
 
-| 外设 | CH32V307RCT6 引脚 | 备注 |
-|---|---|---|
-| 舵机1 右前 | PA6 = TIM3_CH1 | 50Hz PWM |
-| 舵机2 右后 | PA7 = TIM3_CH2 | 50Hz PWM |
-| 舵机3 左前 | PB0 = TIM3_CH3 | 50Hz PWM |
-| 舵机4 左后 | PB1 = TIM3_CH4 | 50Hz PWM |
-| OLED SCL / SDA | PB8 / PB9 | 软件 I2C，地址 0x78 |
-| 语音识别 ASR | PB10(TX) / PB11(RX) | USART3，9600，轮询收发 |
-| LED | PC13 | 板载 |
-
-> ⚠️ 舵机 5V 必须单独供电（330µF ×5 滤波），并与 CH32V307 共地。
-
-## 🧩 STM32 → CH32V307 引脚映射表
-
-已按 ST《DS5319》与 CH32V307 数据手册逐脚核实，完整版见 [docs/pin-mapping.md](docs/pin-mapping.md)。
-
-| 功能 | 引脚名 | F103C8 LQFP48脚 | CH32V307 LQFP64脚 |
+| 功能 | 引脚 | LQFP48 脚 | 备注 |
 |---|---|---|---|
-| 舵机1右前 | PA6 | 16 | 22 |
-| 舵机2右后 | PA7 | 17 | 23 |
-| 舵机3左前 | PB0 | 18 | 26 |
-| 舵机4左后 | PB1 | 19 | 27 |
-| OLED SCL | PB8 | 45 | 61 |
-| OLED SDA | PB9 | 46 | 62 |
-| ASR TX | PB10 | 21 | 29 |
-| ASR RX | PB11 | 22 | 30 |
-| LED | PC13 | 2 | 2 |
-| SWDIO | PA13 | 34 | 46 |
-| SWCLK | PA14 | 37 | 49 |
-| NRST | — | 7 | 7 |
-| BOOT0 | — | 44 | 60 |
-| BOOT1 | PB2 | 20 | 28 |
-| 晶振 | PC14/PC15 | 3/4 | 3/4 |
-| 晶振 | PD0/PD1 | 5/6 | 5/6 |
-| VDD | — | 24/36/48 | 32(VIO_1)/48/64(VIO_3) |
-| VSS | — | 23/35/47 | 31/47/63 |
-| VBAT/VDDA/VSSA | — | 1/9/8 | 1/13/12 |
-| CH32V307独有 | VDD_4(19)→3.3V, VSS_4(18)→GND, PC0~PC12/PD2→悬空 | — | — |
+| 舵机1 右前 | PA6 | 16 | TIM3_CH1，50Hz PWM |
+| 舵机2 右后 | PA7 | 17 | TIM3_CH2 |
+| 舵机3 左前 | PB0 | 18 | TIM3_CH3 |
+| 舵机4 左后 | PB1 | 19 | TIM3_CH4 |
+| OLED SCL | PB8 | 45 | 软件 I2C，地址 0x78 |
+| OLED SDA | PB9 | 46 | 软件 I2C |
+| ASR TX | PB10 | 21 | USART3，9600，轮询收发 |
+| ASR RX | PB11 | 22 | USART3 |
+| LED | PC13 | 2 | 板载，低电平点亮 |
+| SWDIO | PA13 | 34 | WCH-Link 烧录 |
+| SWCLK | PA14 | 37 | WCH-Link 烧录 |
+| NRST | — | 7 | 复位 |
+| BOOT0 | — | 44 | 串口 ISP 烧录时接高电平 |
+| BOOT1 | PB2 | 20 | |
+| 晶振 | PC14 / PC15 | 3 / 4 | 原板 8MHz 晶振（固件用内部时钟） |
+| 晶振 | PD0 / PD1 | 5 / 6 | |
+| 电源 VDD ×3 | — | 24 / 36 / 48 | 3.3V |
+| 地 VSS ×3 | — | 23 / 35 / 47 | GND |
+| 备份 / 模拟 | VBAT / VDDA / VSSA | 1 / 9 / 8 | |
 
-## 🛠️ 转接板方案（LQFP48 → LQFP64）
+> ⚠️ 舵机 5V 必须单独供电（330µF ×5 滤波），并与 CH32V303CBT6 共地。
 
-原板焊接位为 STM32F103C8T6（LQFP48），新主控 CH32V307RCT6 为 LQFP64。为不改动原 PCB，采用 **13 × 13mm 双面转接板**：
+## 📌 同脚位直插表（CH32V303CBT6 LQFP-48，引脚号即芯片脚位）
 
-- **底面**：LQFP48 焊盘（镜像布局），焊回原板主控位置
-- **顶面**：CH32V307RCT6 + 0.1µF 去耦电容
-- **走线原则**：全部引脚**同名互连**（PA6↔PA6、PB8↔PB8 ……）
-- **焊接要点**：转接板**翻面焊接**，转接板引脚 1 对准原板引脚 1
+下表同时就是 STM32F103C8T6 的脚位表 —— 两片芯片**逐脚一一对应**，所以直插即可。
 
-| 器件 | LCSC 编号 |
-|---|---|
-| STM32F103C8T6（原板） | C8734 |
-| CH32V307RCT6 | C2988083 |
-| 100nF 去耦电容 | C14663 |
+| 功能 | 引脚名 | LQFP48 脚 | 备注 |
+|---|---|---|---|
+| 舵机1右前 | PA6 | 16 | TIM3_CH1 |
+| 舵机2右后 | PA7 | 17 | TIM3_CH2 |
+| 舵机3左前 | PB0 | 18 | TIM3_CH3 |
+| 舵机4左后 | PB1 | 19 | TIM3_CH4 |
+| OLED SCL | PB8 | 45 | 软件 I2C |
+| OLED SDA | PB9 | 46 | 软件 I2C |
+| ASR TX | PB10 | 21 | USART3 |
+| ASR RX | PB11 | 22 | USART3 |
+| LED | PC13 | 2 | 低电平点亮 |
+| SWDIO | PA13 | 34 | |
+| SWCLK | PA14 | 37 | |
+| NRST | — | 7 | |
+| BOOT0 | — | 44 | |
+| BOOT1 | PB2 | 20 | |
+| 晶振 | PC14/PC15 | 3/4 | 原板 8MHz 晶振（固件用内部时钟） |
+| 晶振 | PD0/PD1 | 5/6 | |
+| 电源 | VDD×3 | 24/36/48 | 3.3V |
+| 地 | VSS×3 | 23/35/47 | |
+| 备份/模拟 | VBAT/VDDA/VSSA | 1/9/8 | |
 
-CH32V307 独有引脚处理：VDD_4(19)→3.3V，VSS_4(18)→GND，PC0~PC12 / PD2→悬空。
-详见 [docs/adapter.md](docs/adapter.md)。
+完整说明见 [docs/pin-mapping.md](docs/pin-mapping.md)。
+
+## 🛠️ 直插替换 4 步流程
+
+1. **焊下**原板上的 STM32F103C8T6（LQFP-48）。
+2. **清理焊盘**（吸锡带拖平，少量助焊剂），核对丝印 **引脚 1 的圆点 / 缺角方向**。
+3. **焊上** CH32V303CBT6（同 LQFP-48、同引脚编号），**注意引脚 1 方向**，四边对齐后拖焊。
+4. **烧录验证**：无需转接板、无需改板；原板晶振、电源、外设电路全部不动。
+   用 **WCH-Link** 走 PA13(SWDIO) / PA14(SWCLK) 烧录，或走串口 ISP（BOOT0 接高电平）。
+
+详见 [docs/direct-replacement.md](docs/direct-replacement.md)。
 
 ## 📁 目录结构
 
@@ -88,14 +120,16 @@ CH32V307 独有引脚处理：VDD_4(19)→3.3V，VSS_4(18)→GND，PC0~PC12 / PD
 │   ├── app_dog.c            # RT-Thread 线程（cmd / action）
 │   └── OLED.c / OLED.h / OLED_Data.c / OLED_Data.h   # 江协科技 SSD1306 驱动（已适配 ch32v30x）
 └── docs/
-    ├── pin-mapping.md       # STM32 → CH32V307 引脚映射表
-    ├── adapter.md           # 转接板设计说明
+    ├── pin-mapping.md       # CH32V303CBT6 同脚位引脚表
+    ├── direct-replacement.md # 同脚位直插替换流程与注意事项
     └── bom.md               # BOM 清单
 ```
 
 ## 🚀 快速开始
 
-**前提**：用 RT-Thread Studio 基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程，或用 scons / Env 工具链。
+**前提**：用 RT-Thread Studio 基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程
+（V303 与 V307 同内核、同外设寄存器，可直接使用该 BSP），或用 WCH MRS 的 CH32V303 工程。
+**注意**：V303 的 Flash 为 **128KB**、SRAM 为 **32KB**，需把链接脚本（`link.ld`）改为 **128K / 32K**。
 
 1. 将 [firmware/](firmware/) 下所有 .c/.h 拷入工程的 `applications/`（或新建 `dog/` 目录并加入编译）。
 2. 删除或覆盖工程自带的 `applications/main.c`（本工程 `app_dog.c` 已提供 `int main(void)`）。
@@ -103,12 +137,13 @@ CH32V307 独有引脚处理：VDD_4(19)→3.3V，VSS_4(18)→GND，PC0~PC12 / PD
    - 开启 `RT_USING_MAILBOX`（动作线程用到邮箱）；
    - 关闭 `RT_USING_SERIAL`，或不启用 uart3 设备（固件直接操作 USART 外设，避免冲突）；
    - `rt_snprintf` 由内核提供，无需 newlib；未启用 libc 时也无需开 `RT_USING_LIBC`。
-4. 编译烧录：MounRiver / RT-Thread Studio + WCH-Link。
+4. 编译烧录：MounRiver / RT-Thread Studio + WCH-Link（PA13 / PA14 SWD）。
 
 ### ⚠️ 必须核对 / 自测的 3 个点
 
-1. **定时器时钟**：固件按 `DOG_TIM_CLK_HZ = 144MHz` 计算预分频。若你的板子主频不是 144MHz，
-   改 `firmware/dog_config.h` 里的 `DOG_TIM_CLK_HZ`（舵机频率必须保持 50Hz，否则会抖、发热）。
+1. **主频必须 144MHz**：固件按 `DOG_TIM_CLK_HZ = 144MHz` 计算预分频。主频不对，定时器 / 舵机 50Hz、
+   串口波特率都会偏。若你的板子主频不是 144MHz，改 `firmware/dog_config.h` 里的 `DOG_TIM_CLK_HZ`
+   （舵机频率必须保持 50Hz，否则会抖、发热）。
 2. **OLED 地址**：默认 0x78（`OLED.c` 内 `OLED_WriteCommand` / `OLED_WriteData` 里写死）。
    若你的屏是 0x7A / 0x3C，改那两处。
 3. **中文编码**：`dog_mode.c` 必须保存为 GBK/GB2312（已按 GBK 写好），否则注释乱码。
@@ -137,13 +172,12 @@ CH32V307 独有引脚处理：VDD_4(19)→3.3V，VSS_4(18)→GND，PC0~PC12 / PD
 | 原版 B 站视频 | https://www.bilibili.com/video/BV1UmUfBNEwu |
 | 外壳 3D 打印模型（MakerWorld） | https://makerworld.com.cn/zh/models/1937892-stm32man-bo-ji-qi-ren-wai-ke |
 
-## 📄 声明与许可
+## 📄 第三方版权声明
 
 本项目代码以 **MIT License** 发布（见 [LICENSE](LICENSE)，`Copyright (c) 2026 曼波小狗项目组`）。
 
 第三方组件保留其各自权利：
 
-- **OLED 驱动**（OLED.c / OLED_Data.c / OLED.h / OLED_Data.h）版权归**江协科技**，本项目仅做 CH32V307 适配；
-- **动作 / 表情逻辑**版权归原 **manbo-robot-dog** 作者（https://github.com/RussellCooper-DJZ/manbo-robot-dog，MIT 许可）。
-
-原硬件设计（PCB / 外壳）版权归原工程作者 herobrine（立创开源广场 oshwhub）。
+- **OLED 驱动**（OLED.c / OLED_Data.c / OLED.h / OLED_Data.h）版权归**江协科技**，本项目仅做 CH32V303 适配；
+- **动作 / 表情逻辑**版权归原 **manbo-robot-dog** 作者（https://github.com/RussellCooper-DJZ/manbo-robot-dog，MIT 许可）；
+- **原硬件设计**（PCB / 外壳）版权归原工程作者 herobrine（立创开源广场 oshwhub）。
