@@ -149,6 +149,37 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 3. **中文编码**：`dog_mode.c` 必须保存为 GBK/GB2312（已按 GBK 写好），否则注释乱码。
    MounRiver：项目 → Properties → Resource → Text file encoding → GBK。
 
+
+## 🔧 烧录与工具（全部已打包在 `tools/`）
+
+| 工具 | 用途 | 位置 |
+|---|---|---|
+| `tools/WCH-LinkUtility.exe` | SWD 烧录工具（WCH-Link，GUI） | 本仓库 |
+| `tools/WCHLinkDrv_WHQL_S.exe` / `CH372DRV_S.exe` | WCH-Link 驱动 | 本仓库 |
+| WCH-LinkE 硬件 | USB 转 SWD 调试器（约 ¥20） | 淘宝/立创搜 "WCH-LinkE" |
+| MounRiver Studio | 官方 IDE（编译 + 一键下载） | [mounriver.com/download](https://www.mounriver.com/download) |
+| WCHISPTool | USB ISP 烧录（无 WCH-Link，BOOT0 拉高） | [wch.cn 下载](https://www.wch.cn/downloads/WCHISPTool_Setup.html) |
+| wchisp（可选） | 开源命令行烧录器 | [github.com/ch32-rs/wchisp](https://github.com/ch32-rs/wchisp) |
+
+**接线**（WCH-Link → CH32V303CBT6）：SWDIO → PA13(34脚)、SWCLK → PA14(37脚)、GND → GND、3V3 → 3.3V。
+**烧录步骤**：安装驱动 → WCH-LinkUtility 选芯片 CH32V303 → Read Chip Info 验证连接 → Open File 选 .hex → Download。
+详细图文说明见 [`tools/README.md`](tools/README.md)（含 USB ISP、命令行、常见问题排查）。
+
+### 编译参数（已验证的 RISC-V 工具链配置）
+
+```bash
+riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
+```
+
+- **器件宏必须是 `CH32V30x_D8`**（CH32V303）；不定义时 SDK 默认按 CH32V307（`D8C`）编译；
+- 内核参数 `rv32imafc`（注意字母顺序，写成 `rv32imacf` 会报错）+ ABI `ilp32f`；
+- Flash 128KB / SRAM 32KB（链接脚本需相应配置）；
+- 本仓库固件已用官方 SDK 头文件 + RISC-V GCC 10.2 实测 **8/8 文件编译通过**。
+
+### 固件架构
+
+![固件架构](docs/firmware-arch.png)
+
 ## 🗣️ 命令协议（单字符，语音）
 
 | 字符 | 动作 | 字符 | 动作 |
