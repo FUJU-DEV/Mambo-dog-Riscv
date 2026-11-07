@@ -120,9 +120,28 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
     └── bom.md               # BOM 清单
 ```
 
-##  快速开始
+## 📦 复现指南（先看这里）
 
-**前提**：用 RT-Thread Studio 基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程
+**复现这个项目需要的条件**（缺一不可，请先自查）：
+
+| 需要 | 说明 |
+|---|---|
+| 硬件 | 原版曼波机器狗 PCB（[oshwhub](https://oshwhub.com/herobrine/stm32-mambo-robot-dog) 打样/购买）+ CH32V303CBT6 + 4×SG90 + ASRPRO 模块 + WCH-Link（详见 [docs/hardware.md](docs/hardware.md)） |
+| 技能 | 会 LQFP-48 芯片焊接（0.5mm 间距）、会用 RT-Thread Studio 建工程、会用天问Block 配语音模块 |
+| 时间 | 硬件打样 3-5 天 + 焊接调试 1-2 天 |
+
+**三个配套文档（缺了它们复现会卡住）：**
+
+1. 🔧 [docs/build.md](docs/build.md) —— **编译工程搭建全流程**：RT-Thread Studio 步骤、rtconfig.h 关键项（开 mailbox / 器件宏 CH32V30x_D8）、link.ld 128K/32K、常见报错解决；
+2. 🎙 [docs/asrpro-config.md](docs/asrpro-config.md) —— **ASRPRO 词条对照表**（"前进"→`f` 等 25 条）+ 天问Block 配置步骤 + 串口 9600 设置；
+3. 📋 [docs/hardware.md](docs/hardware.md) —— **整机物料清单**（含电池/舵机/喇叭/外壳/采购渠道/成本估算）。
+
+> 💡 没有 ASRPRO 模块也能测试全部动作逻辑：用 USB-TTL 接 PB10/PB11（9600 8N1），串口助手直接发命令字符即可。
+
+> 📦 **关于预编译固件**：仓库暂不提供 `.hex`（固件依赖完整 RT-Thread 工程才能链接产出），请按 [docs/build.md](docs/build.md) 自行编译；编译成功后用 tools/ 里的 WCH-LinkUtility 烧录即可。
+
+## 🚀 快速开始
+**前提**：用 RT-Thread Studio（**RT-Thread 5.1.x 或更高**）基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程
 （V303 与 V307 同内核、同外设寄存器，可直接使用该 BSP），或用 WCH MRS 的 CH32V303 工程。
 **注意**：V303 的 Flash 为 **128KB**、SRAM 为 **32KB**，需把链接脚本（`link.ld`）改为 **128K / 32K**。
 
@@ -143,6 +162,8 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
    若你的屏是 0x7A / 0x3C，改那两处。
 3. **中文编码**：`dog_mode.c` 必须保存为 GBK/GB2312（已按 GBK 写好），否则注释乱码。
    MounRiver：项目 → Properties → Resource → Text file encoding → GBK。
+   > GitHub 网页上看到 `dog_mode.c` 中文注释乱码是**正常现象**（文件按 GBK 存储，网页按 UTF-8 显示），
+   > 不影响编译；按上面设置 GBK 编码即可正常打开。
 
 
 ## 烧录与工具
