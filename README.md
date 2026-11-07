@@ -199,7 +199,6 @@ riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
 |---|---|
 | 原工程（立创开源广场 oshwhub） | https://oshwhub.com/herobrine/stm32-mambo-robot-dog |
 | 原固件源码（STM32F103） | https://github.com/RussellCooper-DJZ/manbo-robot-dog |
-| 原版 B 站视频 | https://www.bilibili.com/video/BV1UmUfBNEwu |
 | 外壳 3D 打印模型（MakerWorld） | https://makerworld.com.cn/zh/models/1937892-stm32man-bo-ji-qi-ren-wai-ke |
 
 ##  第三方版权声明
