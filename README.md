@@ -5,12 +5,9 @@
 **RT-Thread**，**纯离线**运行（无 WiFi、无蓝牙、无云端 AI），通过 **ASRPRO 离线语音模块** 控制
 **4 个 SG90 舵机** 与 **0.96 英寸 OLED** 表情。
 
-> ⚡ **核心结论：原板无需改板、无需转接板 —— 焊下 STM32F103C8T6，原焊盘直接焊上 CH32V303CBT6，引脚 1 对引脚 1。**
-
 ## ✨ 特性
 
 - **RISC-V 144MHz 主控**：CH32V303CBT6（青稞 V4F / 144MHz / 128KB Flash / 32KB SRAM / LQFP-48）
-- **LQFP-48 同脚位直插**：引脚编号与 STM32F103C8T6 **完全一致**，原板不用改板、不用转接板
 - **纯离线**：无 WiFi、无蓝牙、无云端；语音识别与录音播放全部由 ASRPRO 离线模块完成
 - **ASRPRO 语音**：单字符命令协议（USART3，9600），支持语音唤醒
 - **4 × SG90 舵机**：TIM3 四路 50Hz PWM（PA6 / PA7 / PB0 / PB1）
@@ -31,12 +28,10 @@
 | 网络 | — | 纯离线，无 WiFi 无云 |
 | LCSC 编号 | C8734 | C7494374 |
 
-**结论：CH32V303CBT6 是 LQFP-48，且引脚编号与 STM32F103C8T6 完全相同**（PA6=16、PA7=17、PB0=18、
+CH32V303CBT6 是 LQFP-48，且引脚编号与 STM32F103C8T6 相同**（PA6=16、PA7=17、PB0=18、
 PB1=19、PB2=20、PB10=21、PB11=22、VSS=23、VDD=24、PB12=25…PB15=28、PA8=29…PA11=32、PA12=33、
 PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8=45、PB9=46、VSS=47、VDD=48）。
 
-- **原板无需改板、无需转接板，引脚 1 对引脚 1** —— 原板 U6 焊盘直接焊接即可。
-- 原板晶振、电源、充电、舵机 / OLED / ASR 外设电路**全部不动**；固件使用的引脚与外设与原版完全一致。
 
 ## 🔌 硬件接线表
 
@@ -62,7 +57,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | 地 VSS ×3 | — | 23 / 35 / 47 | GND |
 | 备份 / 模拟 | VBAT / VDDA / VSSA | 1 / 9 / 8 | |
 
-> ⚠️ 舵机 5V 必须单独供电（330µF ×5 滤波），并与 CH32V303CBT6 共地。
+> ⚠️ 舵机 5V 必须单独供电
 
 ## 📌 同脚位直插表（CH32V303CBT6 LQFP-48，引脚号即芯片脚位）
 
@@ -150,7 +145,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
    MounRiver：项目 → Properties → Resource → Text file encoding → GBK。
 
 
-## 🔧 烧录与工具（全部已打包在 `tools/`）
+## 🔧 烧录与工具
 
 | 工具 | 用途 | 位置 |
 |---|---|---|
@@ -165,13 +160,13 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 **烧录步骤**：安装驱动 → WCH-LinkUtility 选芯片 CH32V303 → Read Chip Info 验证连接 → Open File 选 .hex → Download。
 详细图文说明见 [`tools/README.md`](tools/README.md)（含 USB ISP、命令行、常见问题排查）。
 
-### 编译参数（已验证的 RISC-V 工具链配置）
+### 编译参数
 
 ```bash
 riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
 ```
 
-- **器件宏必须是 `CH32V30x_D8`**（CH32V303）；不定义时 SDK 默认按 CH32V307（`D8C`）编译；
+- 器件宏须是 `CH32V30x_D8`**（CH32V303）；不定义时 SDK 默认按 CH32V307（`D8C`）编译；
 - 内核参数 `rv32imafc`（注意字母顺序，写成 `rv32imacf` 会报错）+ ABI `ilp32f`；
 - Flash 128KB / SRAM 32KB（链接脚本需相应配置）；
 - 本仓库固件已用官方 SDK 头文件 + RISC-V GCC 10.2 实测 **8/8 文件编译通过**。
@@ -179,20 +174,6 @@ riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
 ### 固件架构
 
 ![固件架构](docs/firmware-arch.png)
-
-## 🗣️ 命令协议（单字符，语音）
-
-| 字符 | 动作 | 字符 | 动作 |
-|---|---|---|---|
-| f / b | 前进 / 后退 | l / r | 左转 / 右转 |
-| w / z | 前后摇 / 左右摇 | d | 跳舞 |
-| 5 | 立正 | q | 起身 |
-| s | 坐下擦脸 | j | 交替抬手 |
-| y | 伸懒腰 | 1 | 抬头 |
-| p | 趴下睡觉 | 2 | 卧下睡觉 |
-| o | 打招呼 | n | 难受 |
-| B / Y / X / W | 表白 / 元素周期表 / 校训 / 世界之光 | | |
-| U | 语音唤醒 | K / T / Z | 查开心值 / 体力值 / 两者 |
 
 ## 🔗 参考链接
 
@@ -205,8 +186,7 @@ riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
 
 ## 📄 第三方版权声明
 
-本项目代码以 **MIT License** 发布（见 [LICENSE](LICENSE)，`Copyright (c) 2026 曼波小狗项目组`）。
-
+本项目代码以 **MIT License** 发布
 第三方组件保留其各自权利：
 
 - **OLED 驱动**（OLED.c / OLED_Data.c / OLED.h / OLED_Data.h）版权归**江协科技**，本项目仅做 CH32V303 适配；
