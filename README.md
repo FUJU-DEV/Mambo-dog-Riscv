@@ -1,8 +1,8 @@
 # 曼波小狗 · CH32V303CBT6 + RT-Thread（纯离线版）
 
-桌面四足机器狗「曼波小狗」的国产 RISC-V 改造：主控由 **STM32F103C8T6** 直接换成 **CH32V303CBT6**
-（青稞 RISC-V V4F，144MHz，128KB Flash / 32KB SRAM，**LQFP-48 与原芯片同脚位**），固件从裸机移植到
-**RT-Thread**，**纯离线**运行（无 WiFi、无蓝牙、无云端 AI），通过 **ASRPRO 离线语音模块** 控制
+桌面四足机器狗的RISC-V移植：主控由 **STM32F103C8T6** 进行移植开发 **CH32V303CBT6**
+（青稞 RISC-V V4F，144MHz，128KB Flash / 32KB SRAM）
+**RT-Thread**通过 **ASRPRO 离线语音模块** 控制
 **4 个 SG90 舵机** 与 **0.96 英寸 OLED** 表情。
 
 ## ✨ 特性
