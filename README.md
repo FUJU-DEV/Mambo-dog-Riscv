@@ -129,7 +129,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 **三个配套文档（缺了它们复现会卡住）：**
 
-1. 🔧 [docs/build.md](docs/build.md) —— **编译工程搭建全流程**：RT-Thread Studio 步骤、rtconfig.h 关键项（开 mailbox / 器件宏 CH32V30x_D8）、link.ld 128K/32K、常见报错解决；
+1. 🔧 [project/](project/README.md) + [docs/build.md](docs/build.md) —— **编译工程**：project/ 是配置好的覆盖包（rtconfig/link.lds 128K·32K/board），覆盖到 RT-Thread 官方 BSP 即得可编译工程：RT-Thread Studio 步骤、rtconfig.h 关键项（开 mailbox / 器件宏 CH32V30x_D8）、link.ld 128K/32K、常见报错解决；
 2. 🎙 [docs/asrpro-config.md](docs/asrpro-config.md) —— **ASRPRO 词条对照表**（"前进"→`f` 等 25 条）+ 天问Block 配置步骤 + 串口 9600 设置；
 3. 📋 [docs/hardware.md](docs/hardware.md) —— **整机物料清单**（含电池/舵机/喇叭/外壳/采购渠道/成本估算）。
 

@@ -5,7 +5,28 @@
 
 ---
 
-## 路线一：RT-Thread Studio（推荐）
+## 路线零：使用 `project/` 覆盖包（最快，推荐）
+
+仓库里的 [`project/`](../project/) 是**配置好的工程覆盖包**（rtconfig.h / rtconfig_preinc.h / link.lds 128K/32K /
+board 文件 / SConstruct），按 [project/README.md](../project/README.md) 五步操作即可：
+
+```bash
+git clone --depth 1 https://github.com/RT-Thread/rt-thread.git
+cd rt-thread/bsp/wch/risc-v/ch32v307v-r1
+cp -r <仓库>/project/rtconfig*.h <仓库>/project/rtconfig.py .
+cp -r <仓库>/project/board/* board/
+cp <仓库>/project/SConstruct <仓库>/project/SConscript .
+cp -r <仓库>/project/applications/SConscript applications/
+cp <仓库>/firmware/*.c <仓库>/firmware/*.h applications/
+rm applications/main.c
+scons -j8
+```
+
+> 原理：工程文件/启动文件/SDK 都由 RT-Thread 官方 BSP 提供
+> （`bsp/wch/risc-v/ch32v307v-r1` + `bsp/wch/risc-v/libraries`，后者内置 WCH SDK），
+> 覆盖包只负责把配置改成 CH32V303 正确值（器件宏 `CH32V30x_D8`、128K/32K、关闭串口设备框架）。
+
+## 路线一：RT-Thread Studio（手动建工程）
 
 ### 1. 准备
 
