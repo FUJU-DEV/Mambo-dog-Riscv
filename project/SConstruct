@@ -55,5 +55,16 @@ library_vdir = 'build/libraries'
 # common include drivers
 objs.extend(SConscript(os.path.join(libraries_path_prefix, 'ch32_drivers', 'SConscript'), variant_dir=library_vdir + '/ch32_drivers', duplicate=0))
 
+# 曼波小狗：WCH SDK 以 RT-Thread 包形式提供（packages/ch32v307_sdk），全局暴露其头文件路径
+_sdk = os.path.join(SDK_ROOT, 'packages', 'ch32v307_sdk')
+# 曼波小狗：库在目标文件之后链接（解决 __mulsf3/strchr 等未定义）
+env['LIBS'] = ['c', 'gcc', 'm']
+if os.path.exists(_sdk):
+    env.Append(CPPPATH=[
+        os.path.join(_sdk, 'EVT', 'EXAM', 'SRC', 'Core'),
+        os.path.join(_sdk, 'EVT', 'EXAM', 'SRC', 'Peripheral', 'inc'),
+        os.path.join(_sdk, 'rtt-patch'),
+    ])
+
 # make a building
 DoBuilding(TARGET, objs)

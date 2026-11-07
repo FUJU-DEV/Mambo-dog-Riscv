@@ -122,10 +122,7 @@ void OLED_GPIO_Init(void)
 	uint32_t i, j;
 	
 	/*在初始化前，加入适量延时，待OLED供电稳定*/
-	for (i = 0; i < 1000; i ++)
-	{
-		for (j = 0; j < 1000; j ++);
-	}
+	{ volatile uint32_t d = 2000000; while (d --); }
 	
 	/*将SCL和SDA引脚初始化为开漏模式*/
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);

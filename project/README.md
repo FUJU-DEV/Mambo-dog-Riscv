@@ -20,6 +20,11 @@
 
 ## 使用步骤（5 分钟）
 
+> ⚠️ 前置：WCH SDK 以 RT-Thread **package** 形式提供（`PKG_USING_CH32V307_SDK`），
+> 需放到 BSP 目录下的 `packages/ch32v307_sdk/`（官方做法：Env 工具 `pkgs --update`；
+> 或手动 `git clone https://github.com/kaidegit/CH32V307-SDK-for-RTT packages/ch32v307_sdk`）。
+> 本覆盖包已包含 `packages/SConscript`（自动引入 SDK 包），`SConstruct` 已把 SDK 头文件加入全局 CPPPATH。
+
 ### 1. 获取 RT-Thread 源码
 
 ```bash
@@ -66,6 +71,10 @@ scons -j8
 用仓库 [tools/](../tools/) 里的 WCH-LinkUtility 烧录 `rtthread.bin`（芯片选 **CH32V303**）。
 
 ## 注意
+
+- **舵机引脚**：本工程按原板（oshwhub 5 舵机版）使用 **TIM1 CH1-4（PA8/PA9/PA10/PA11）**，通道顺序（原板 Servo.c）：
+  Servo1→CH3(PA10)、Servo2→CH1(PA8)、Servo3→CH4(PA11)、Servo4→CH2(PA9)；TIM1 需开主输出（MOE，代码已处理）。
+- **8MHz 晶振必须保留**：SDK 的 SystemInit 按 HSE×18=144MHz 配置，晶振缺失会静默停在 8MHz。
 
 - `rtconfig.py` 里 `DEVICE` 参数为 `-march=rv32imac -mabi=ilp32`（官方 BSP 默认，软浮点）——
   CH32V303 硬件浮点未启用不影响本固件（舵机角度计算走软浮点，性能足够）；

@@ -9,10 +9,10 @@
 
 | 功能 | 引脚名 | LQFP48 脚 | 备注 |
 |---|---|---|---|
-| 舵机1右前 | PA6 | 16 | TIM3_CH1 |
-| 舵机2右后 | PA7 | 17 | TIM3_CH2 |
-| 舵机3左前 | PB0 | 18 | TIM3_CH3 |
-| 舵机4左后 | PB1 | 19 | TIM3_CH4 |
+| 舵机1右前 | PA10 | 31 | TIM1_CH3（原板通道顺序）|
+| 舵机2右后 | PA8 | 29 | TIM1_CH1 |
+| 舵机3左前 | PA11 | 32 | TIM1_CH4 |
+| 舵机4左后 | PA9 | 30 | TIM1_CH2 |
 | OLED SCL | PB8 | 45 | 软件 I2C |
 | OLED SDA | PB9 | 46 | 软件 I2C |
 | ASR TX | PB10 | 21 | USART3 |
@@ -23,7 +23,7 @@
 | NRST | — | 7 | |
 | BOOT0 | — | 44 | |
 | BOOT1 | PB2 | 20 | |
-| 晶振 | PC14/PC15 | 3/4 | 原板 8MHz 晶振（固件用内部时钟） |
+| 晶振 | PC14/PC15 | 3/4 | 原板 8MHz 晶振（必须保留：SDK 按 HSE×18=144MHz 配置，缺晶振会静默降到 8MHz） |
 | 晶振 | PD0/PD1 | 5/6 | |
 | 电源 | VDD×3 | 24/36/48 | 3.3V |
 | 地 | VSS×3 | 23/35/47 | |
@@ -39,6 +39,6 @@ PB8=45、PB9=46、VSS=47、VDD=48。
 
 - 上表同时适用于两种芯片：CH32V303CBT6 与 STM32F103C8T6 的 LQFP-48 脚位**逐脚相同**，
   不存在「CH32V307 独有电源脚 / PC0~PC12 悬空」这类差异（那是 LQFP-64 方案的历史问题，已作废）。
-- 固件使用的引脚与外设与原版完全一致：TIM3 四路 PWM、USART3、GPIOB 软件 I2C、PC13 LED、SWD。
+- 固件使用的引脚与外设与原版完全一致：TIM1 四路 PWM、USART3、GPIOB 软件 I2C、PC13 LED、SWD。
 - 新固件使用内部时钟，晶振相关引脚（PC14/PC15、PD0/PD1）沿用原板布局即可，晶振可保留不焊。
 - 焊接替换步骤见 [direct-replacement.md](direct-replacement.md)。

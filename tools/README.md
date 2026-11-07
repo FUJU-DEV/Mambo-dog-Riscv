@@ -22,7 +22,7 @@
 | **MounRiver Studio** | 官方 IDE（编译+一键下载，自带 RISC-V GCC 与 SDK） | https://www.mounriver.com/download |
 | **WCHISPTool** | USB/串口 ISP 烧录（无需 WCH-Link，BOOT0 拉高进入） | https://www.wch.cn/downloads/WCHISPTool_Setup.html |
 | **ch32v30x SDK** | 外设库/启动文件/示例（MounRiver 已内置） | https://github.com/openwch/ch32v307 （或 MounRiver 内置） |
-| **wchisp**（可选） | 开源命令行烧录器（跨平台，CI 友好） | https://github.com/ch32-rs/wchisp |
+| **wchisp**（可选） | 开源命令行烧录器（**USB/UART ISP，不是 SWD**；SWD 用 WCH-LinkUtility） | https://github.com/ch32-rs/wchisp |
 
 ## 烧录方法（任选其一）
 
@@ -61,7 +61,7 @@
 
 ```bash
 # 安装 Rust 后：cargo install wchisp
-wchisp flash firmware.hex        # SWD 烧录（需 WCH-Link）
+wchisp flash firmware.hex        # USB/UART ISP（BOOT0 拉高，非 SWD）
 wchisp --help
 ```
 

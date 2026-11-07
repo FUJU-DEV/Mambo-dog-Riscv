@@ -117,8 +117,8 @@
 #define RT_MAIN_THREAD_STACK_SIZE 2048
 #define RT_MAIN_THREAD_PRIORITY 10
 #define RT_USING_MSH
-#define RT_USING_FINSH
-#define FINSH_USING_MSH
+/* #define RT_USING_FINSH */
+/* #define FINSH_USING_MSH */
 #define FINSH_THREAD_NAME "tshell"
 #define FINSH_THREAD_PRIORITY 11
 #define FINSH_THREAD_STACK_SIZE 2048
@@ -415,8 +415,8 @@
 /* On-chip Peripheral Drivers */
 
 #define BSP_USING_GPIO
-#define BSP_USING_UART
-#define BSP_USING_UART1
+/* #define BSP_USING_UART */
+/* #define BSP_USING_UART1 */
 #define BSP_UART1_RX_BUFSIZE 256
 #define BSP_UART1_TX_BUFSIZE 0
 #define LSI_VALUE 40000

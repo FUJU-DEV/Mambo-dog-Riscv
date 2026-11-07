@@ -3,7 +3,9 @@ import os
 
 cwd     = GetCurrentDir()
 CPPPATH = [cwd]
-src = ['main.c']
+
+# 曼波小狗：编译 applications/ 下所有固件源文件（app_dog.c 提供 main；不要 main.c）
+src = Glob('*.c')
 
 if GetDepend(['PKG_USING_RTDUINO']) and not GetDepend(['RTDUINO_NO_SETUP_LOOP']):
     src += ['arduino_main.cpp']
@@ -13,6 +15,6 @@ group = DefineGroup('Applications', src, depend = [''], CPPPATH = CPPPATH)
 list = os.listdir(cwd)
 for item in list:
     if os.path.isfile(os.path.join(cwd, item, 'SConscript')):
-        group = group + SConscript(os.path.join(item, 'SConscript'))
+        group = group + SConscript(os.path.join(cwd, item, 'SConscript'))
 
 Return('group')

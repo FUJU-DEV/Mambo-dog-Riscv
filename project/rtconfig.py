@@ -40,11 +40,15 @@ if PLATFORM == 'gcc':
     OBJDUMP = PREFIX + 'objdump'
     OBJCPY = PREFIX + 'objcopy'
 
-    DEVICE = ' -march=rv32imac -mabi=ilp32 -DUSE_PLIC -DUSE_M_TIME -DNO_INIT -mcmodel=medany -msmall-data-limit=8 -L.  -nostartfiles  -lc '
+    DEVICE = ' -march=rv32imac -mabi=ilp32 -DUSE_PLIC -DUSE_M_TIME -DNO_INIT -DCH32V30x_D8 -ffunction-sections -fdata-sections -mcmodel=medany -msmall-data-limit=8 -L.  -nostartfiles '
     CFLAGS = DEVICE
     CFLAGS += ' -save-temps=obj'
     AFLAGS = '-c'+ DEVICE + ' -x assembler-with-cpp'
     LFLAGS = DEVICE
+    # WCH GCC 自带 newlib：默认规格链接即可（-lc 在 DEVICE 里）。
+    # 若用无 newlib 的工具链（如 Ubuntu riscv64-unknown-elf-gcc），取消下面一行的注释：
+    # LFLAGS += ' -lm -nodefaultlibs -lgcc'
+    LFLAGS += ' -lm'
     LFLAGS += ' -Wl,--gc-sections,-cref,-Map=' + MAP_FILE
     LFLAGS += ' -T ' + LINK_FILE
     AFLAGS += ' -I.'

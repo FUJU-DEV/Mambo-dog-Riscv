@@ -10,8 +10,12 @@
 
 #include "board.h"
 #include <stdint.h>
+#ifdef RT_USING_SERIAL
 #include "drv_usart.h"
+#endif
+#ifdef RT_USING_PIN
 #include "drv_gpio.h"
+#endif
 #include <rthw.h>
 #include <rtthread.h>
 

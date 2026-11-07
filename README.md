@@ -20,7 +20,7 @@
 - **RISC-V 144MHz 主控**：CH32V303CBT6（青稞 V4F / 144MHz / 128KB Flash / 32KB SRAM / LQFP-48）
 - **纯离线**：无 WiFi、无蓝牙、无云端；语音识别与录音播放全部由 ASRPRO 离线模块完成
 - **ASRPRO 语音**：单字符命令协议（USART3，9600），支持语音唤醒
-- **4 × SG90 舵机**：TIM3 四路 50Hz PWM（PA6 / PA7 / PB0 / PB1）
+- **4 × SG90 舵机**：TIM1 四路 50Hz PWM（PA8/PA9/PA10/PA11，按原板 Servo.c 通道顺序）
 - **OLED 表情**：0.96" SSD1306（PB8 / PB9 软件 I2C，地址 0x78），实时显示心情 / 体力值
 - **RT-Thread**：cmd / action 双线程 + 邮箱；动作逻辑 100% 移植自原版 manbo-robot-dog
 
@@ -47,10 +47,10 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 | 功能 | 引脚 | LQFP48 脚 | 备注 |
 |---|---|---|---|
-| 舵机1 右前 | PA6 | 16 | TIM3_CH1，50Hz PWM |
-| 舵机2 右后 | PA7 | 17 | TIM3_CH2 |
-| 舵机3 左前 | PB0 | 18 | TIM3_CH3 |
-| 舵机4 左后 | PB1 | 19 | TIM3_CH4 |
+| 舵机1 右前 | PA10 | 31 | TIM1_CH3（原板 Servo1→CH3），50Hz PWM |
+| 舵机2 右后 | PA8 | 29 | TIM1_CH1（原板 Servo2→CH1）|
+| 舵机3 左前 | PA11 | 32 | TIM1_CH4（原板 Servo3→CH4）|
+| 舵机4 左后 | PA9 | 30 | TIM1_CH2（原板 Servo4→CH2）|
 | OLED SCL | PB8 | 45 | 软件 I2C，地址 0x78 |
 | OLED SDA | PB9 | 46 | 软件 I2C |
 | ASR TX | PB10 | 21 | USART3，9600，轮询收发 |
@@ -61,7 +61,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | NRST | — | 7 | 复位 |
 | BOOT0 | — | 44 | 串口 ISP 烧录时接高电平 |
 | BOOT1 | PB2 | 20 | |
-| 晶振 | PC14 / PC15 | 3 / 4 | 原板 8MHz 晶振（固件用内部时钟） |
+| 晶振 | PC14 / PC15 | 3 / 4 | 原板 8MHz 晶振（**必须保留**：SDK 按 HSE×18=144MHz 配置，缺晶振会静默降到 8MHz） |
 | 晶振 | PD0 / PD1 | 5 / 6 | |
 | 电源 VDD ×3 | — | 24 / 36 / 48 | 3.3V |
 | 地 VSS ×3 | — | 23 / 35 / 47 | GND |
@@ -73,10 +73,10 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 | 功能 | 引脚名 | LQFP48 脚 | 备注 |
 |---|---|---|---|
-| 舵机1右前 | PA6 | 16 | TIM3_CH1 |
-| 舵机2右后 | PA7 | 17 | TIM3_CH2 |
-| 舵机3左前 | PB0 | 18 | TIM3_CH3 |
-| 舵机4左后 | PB1 | 19 | TIM3_CH4 |
+| 舵机1右前 | PA10 | 31 | TIM1_CH3（原板通道顺序）|
+| 舵机2右后 | PA8 | 29 | TIM1_CH1 |
+| 舵机3左前 | PA11 | 32 | TIM1_CH4 |
+| 舵机4左后 | PA9 | 30 | TIM1_CH2 |
 | OLED SCL | PB8 | 45 | 软件 I2C |
 | OLED SDA | PB9 | 46 | 软件 I2C |
 | ASR TX | PB10 | 21 | USART3 |
@@ -87,7 +87,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | NRST | — | 7 | |
 | BOOT0 | — | 44 | |
 | BOOT1 | PB2 | 20 | |
-| 晶振 | PC14/PC15 | 3/4 | 原板 8MHz 晶振（固件用内部时钟） |
+| 晶振 | PC14/PC15 | 3/4 | 原板 8MHz 晶振（**必须保留**：SDK 按 HSE×18=144MHz 配置，缺晶振会静默降到 8MHz） |
 | 晶振 | PD0/PD1 | 5/6 | |
 | 电源 | VDD×3 | 24/36/48 | 3.3V |
 | 地 | VSS×3 | 23/35/47 | |
@@ -137,9 +137,21 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 > 📦 **关于预编译固件**：仓库暂不提供 `.hex`（固件依赖完整 RT-Thread 工程才能链接产出），请按 [docs/build.md](docs/build.md) 自行编译；编译成功后用 tools/ 里的 WCH-LinkUtility 烧录即可。
 
+## ✅ 实测编译（2026-11-07）
+
+| 项目 | 结果 |
+|---|---|
+| 工具链 | riscv64-unknown-elf-gcc 10.2 + picolibc + WCH SDK v2.7 |
+| 构建 | `scons` 全量成功 |
+| 产物 | `rtthread.bin` = **49,488 字节** |
+| FLASH | 49.5 KB / 128 KB（**37.8%**；text 48,896 / data 592 / bss 4,800）|
+| 配置 | `-march=rv32imac -mabi=ilp32`、`-DCH32V30x_D8`、`-ffunction-sections`、`-lm` |
+
+> 正式使用建议 WCH RISC-V GCC 8.2（识别 CH32V 的 interrupt 属性）；其他 GCC 也可编译，中断入口行为以官方工具链为准。
+
 ## 🚀 快速开始
 **前提**：用 RT-Thread Studio（**RT-Thread 5.1.x 或更高**）基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程
-（V303 与 V307 同内核、同外设寄存器，可直接使用该 BSP），或用 WCH MRS 的 CH32V303 工程。
+（V303 与 V307 同内核、同外设寄存器，可直接使用该 BSP），或在 MounRiver 里新建 CH32V303CBT6 工程（该模板未验证，优先用 V307 BSP 改）。
 **注意**：V303 的 Flash 为 **128KB**、SRAM 为 **32KB**，需把链接脚本（`link.ld`）改为 **128K / 32K**。
 
 1. 将 [firmware/](firmware/) 下所有 .c/.h 拷入工程的 `applications/`（或新建 `dog/` 目录并加入编译）。
@@ -172,7 +184,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | WCH-LinkE 硬件 | USB 转 SWD 调试器（约 ¥20） | 淘宝/立创搜 "WCH-LinkE" |
 | MounRiver Studio | 官方 IDE（编译 + 一键下载） | [mounriver.com/download](https://www.mounriver.com/download) |
 | WCHISPTool | USB ISP 烧录（无 WCH-Link，BOOT0 拉高） | [wch.cn 下载](https://www.wch.cn/downloads/WCHISPTool_Setup.html) |
-| wchisp（可选） | 开源命令行烧录器 | [github.com/ch32-rs/wchisp](https://github.com/ch32-rs/wchisp) |
+| wchisp（可选） | 开源命令行烧录器（**USB/UART ISP，不是 SWD**；SWD 用 WCH-LinkUtility） | [github.com/ch32-rs/wchisp](https://github.com/ch32-rs/wchisp) |
 
 **接线**（WCH-Link → CH32V303CBT6）：SWDIO → PA13(34脚)、SWCLK → PA14(37脚)、GND → GND、3V3 → 3.3V。
 **烧录步骤**：安装驱动 → WCH-LinkUtility 选芯片 CH32V303 → Read Chip Info 验证连接 → Open File 选 .hex → Download。

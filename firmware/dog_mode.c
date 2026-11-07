@@ -17,7 +17,20 @@ static int my_rand(void)
     return (int)((g_rng >> 16) & 0x7fff);
 }
 
-static void face(const rt_uint8_t *bmp) { OLED_ShowImage(0, 0, 128, 64, bmp); }
+/* 显示表情图。注意：江协驱动是“显存+Update”模型，必须调用 OLED_Update() 才刷新 */
+static void face(const rt_uint8_t *bmp)
+{
+    OLED_ShowImage(0, 0, 128, 64, bmp);
+    OLED_Update();
+}
+
+/* 在屏幕底部显示数值（用于 K/T/Z 查询） */
+static void show_value(const char *tag, int value)
+{
+    OLED_ShowString(0, 48, (char *)tag, OLED_8X16);
+    OLED_ShowNum(32, 48, (uint32_t)value, 3, OLED_8X16);
+    OLED_Update();
+}
 
 /* ---------------- 各状态动作 ---------------- */
 static void mode_forward(void)
@@ -154,25 +167,37 @@ static void mode_biaobai(void)
     g_prev_cmd = g_cmd; g_cmd = '0'; g_stamina -= 2; g_happiness += 5;
 }
 
+/* 元素周期表（Y）：按原版编排，每句 2s，最后 0.5s 收尾 */
 static void mode_yuansu(void)
 {
     face(BMP5); servo_set1(135);
+    rt_thread_mdelay(2000);
     face(BMP10); servo_set3(45);
-    servo_set2(45); servo_set4(135); face(BMP12);
+    rt_thread_mdelay(2000);
+    servo_set2(45); servo_set4(135);
+    rt_thread_mdelay(2000);
+    face(BMP12);
+    rt_thread_mdelay(2000);
     face(BMP11);
     move_shake_qianhou(); move_shake_qianhou(); move_shake_qianhou();
-    rt_thread_mdelay(2000);
+    rt_thread_mdelay(500);
     g_prev_cmd = g_cmd; g_cmd = '0'; g_stamina -= 2; g_happiness += 2;
 }
 
+/* 校训（X）：按原版编排，每句 2s，最后 0.5s 收尾 */
 static void mode_xiaoxun(void)
 {
     face(BMP5); servo_set1(135);
+    rt_thread_mdelay(2000);
     face(BMP10); servo_set3(45);
-    servo_set2(45); servo_set4(135); face(BMP12);
+    rt_thread_mdelay(2000);
+    servo_set2(45); servo_set4(135);
+    rt_thread_mdelay(2000);
+    face(BMP12);
+    rt_thread_mdelay(2000);
     face(BMP11);
     move_shake_qianhou(); move_shake_qianhou();
-    rt_thread_mdelay(2000);
+    rt_thread_mdelay(500);
     g_prev_cmd = g_cmd; g_cmd = '0'; g_stamina -= 2;
 }
 
@@ -191,6 +216,7 @@ static void mode_xiaodai(void)
     g_prev_cmd = g_cmd; g_cmd = '0';
 }
 
+/* 开心值（K）：表情 + 屏幕底部显示数值 */
 static void mode_happiness(void)
 {
     face(BMP1);
@@ -201,10 +227,12 @@ static void mode_happiness(void)
         face(BMP2);
         if (my_rand() % 2) move_sleep_p(); else move_sleep_w();
     }
+    show_value("H:", g_happiness);
     rt_thread_mdelay(3000);
     g_prev_cmd = g_cmd; g_cmd = '0';
 }
 
+/* 体力值（T）：表情 + 屏幕底部显示数值 */
 static void mode_stamina(void)
 {
     face(BMP1);
@@ -215,12 +243,19 @@ static void mode_stamina(void)
         face(BMP2);
         if (my_rand() % 2) move_sleep_p(); else move_sleep_w();
     }
+    show_value("S:", g_stamina);
     rt_thread_mdelay(4000);
     g_prev_cmd = g_cmd; g_cmd = '0';
 }
 
+/* 状态（Z）：同时显示开心值 + 体力值 */
 static void mode_index(void)
 {
+    face(BMP1);
+    show_value("H:", g_happiness);
+    rt_thread_mdelay(1500);
+    show_value("S:", g_stamina);
+    rt_thread_mdelay(1500);
     g_prev_cmd = g_cmd; g_cmd = '0';
 }
 
@@ -235,12 +270,11 @@ void dog_dispatch(char cmd)
 {
     /* 体力耗尽：只接受睡觉 */
     if (g_stamina <= 0) {
-        if (cmd == '2') mode_sleepwo();
-        else if (cmd == 'p') mode_sleeppa();
+        if (cmd == '2') { g_cmd = cmd; mode_sleepwo(); }
+        else if (cmd == 'p') { g_cmd = cmd; mode_sleeppa(); }
         return;
     }
     g_cmd = cmd;
-
 
     switch (cmd) {
         case 'f': mode_forward();     break;
