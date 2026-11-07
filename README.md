@@ -93,18 +93,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | 地 | VSS×3 | 23/35/47 | |
 | 备份/模拟 | VBAT/VDDA/VSSA | 1/9/8 | |
 
-完整说明见 [docs/pin-mapping.md](docs/pin-mapping.md)。
-
-## 直插替换 4 步流程
-
-1. **焊下**原板上的 STM32F103C8T6（LQFP-48）。
-2. **清理焊盘**（吸锡带拖平，少量助焊剂），核对丝印 **引脚 1 的圆点 / 缺角方向**。
-3. **焊上** CH32V303CBT6（同 LQFP-48、同引脚编号），**注意引脚 1 方向**，四边对齐后拖焊。
-4. **烧录验证**：无需转接板、无需改板；原板晶振、电源、外设电路全部不动。
-   用 **WCH-Link** 走 PA13(SWDIO) / PA14(SWCLK) 烧录，或走串口 ISP（BOOT0 接高电平）。
-
-详见 [docs/direct-replacement.md](docs/direct-replacement.md)。
-
+完整说明见 [docs/pin-mapping.md](docs/pin-mapping.md)
 ## 目录结构
 
 ```
