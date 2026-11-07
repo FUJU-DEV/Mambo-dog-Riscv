@@ -5,6 +5,16 @@
 **RT-Thread**通过 **ASRPRO 离线语音模块** 控制
 **4 个 SG90 舵机** 与 **0.96 英寸 OLED** 表情。
 
+## 📷 实物照片
+
+| 正面 | 开机 · OLED 显示表情 |
+|---|---|
+| ![正面](docs/photos/robot-front.jpg) | ![开机](docs/photos/robot-powered.jpg) |
+| **侧面 · 舵机与腿部** | **背面 · 主控板与接口** |
+| ![侧面](docs/photos/robot-side.jpg) | ![背面](docs/photos/robot-back.jpg) |
+
+> 实拍：原板焊接 CH32V303CBT6，OLED 显示表情，4 × SG90 舵机驱动四足。
+
 ## 特性
 
 - **RISC-V 144MHz 主控**：CH32V303CBT6（青稞 V4F / 144MHz / 128KB Flash / 32KB SRAM / LQFP-48）
