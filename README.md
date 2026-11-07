@@ -5,7 +5,7 @@
 **RT-Thread**通过 **ASRPRO 离线语音模块** 控制
 **4 个 SG90 舵机** 与 **0.96 英寸 OLED** 表情。
 
-## ✨ 特性
+## 特性
 
 - **RISC-V 144MHz 主控**：CH32V303CBT6（青稞 V4F / 144MHz / 128KB Flash / 32KB SRAM / LQFP-48）
 - **纯离线**：无 WiFi、无蓝牙、无云端；语音识别与录音播放全部由 ASRPRO 离线模块完成
@@ -14,7 +14,7 @@
 - **OLED 表情**：0.96" SSD1306（PB8 / PB9 软件 I2C，地址 0x78），实时显示心情 / 体力值
 - **RT-Thread**：cmd / action 双线程 + 邮箱；动作逻辑 100% 移植自原版 manbo-robot-dog
 
-## 🔄 主控替换说明
+## 主控替换说明
 
 | 项目 | 原 STM32F103C8T6 | 新 CH32V303CBT6 |
 |---|---|---|
@@ -33,7 +33,7 @@ PB1=19、PB2=20、PB10=21、PB11=22、VSS=23、VDD=24、PB12=25…PB15=28、PA8=
 PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8=45、PB9=46、VSS=47、VDD=48）。
 
 
-## 🔌 硬件接线表
+## 硬件接线表
 
 | 功能 | 引脚 | LQFP48 脚 | 备注 |
 |---|---|---|---|
@@ -57,9 +57,9 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 | 地 VSS ×3 | — | 23 / 35 / 47 | GND |
 | 备份 / 模拟 | VBAT / VDDA / VSSA | 1 / 9 / 8 | |
 
-> ⚠️ 舵机 5V 必须单独供电
+> 舵机 5V 必须单独供电
 
-## 📌 同脚位直插表（CH32V303CBT6 LQFP-48，引脚号即芯片脚位）
+## 同脚位直插表（CH32V303CBT6 LQFP-48，引脚号即芯片脚位）
 
 下表同时就是 STM32F103C8T6 的脚位表 —— 两片芯片**逐脚一一对应**，所以直插即可。
 
@@ -87,7 +87,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 完整说明见 [docs/pin-mapping.md](docs/pin-mapping.md)。
 
-## 🛠️ 直插替换 4 步流程
+## 直插替换 4 步流程
 
 1. **焊下**原板上的 STM32F103C8T6（LQFP-48）。
 2. **清理焊盘**（吸锡带拖平，少量助焊剂），核对丝印 **引脚 1 的圆点 / 缺角方向**。
@@ -97,7 +97,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
 
 详见 [docs/direct-replacement.md](docs/direct-replacement.md)。
 
-## 📁 目录结构
+## 目录结构
 
 ```
 .
@@ -120,7 +120,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
     └── bom.md               # BOM 清单
 ```
 
-## 🚀 快速开始
+##  快速开始
 
 **前提**：用 RT-Thread Studio 基于官方 BSP「CH32V307V-R1」（路径 `bsp/wch/risc-v/ch32v307v-r1`）新建工程
 （V303 与 V307 同内核、同外设寄存器，可直接使用该 BSP），或用 WCH MRS 的 CH32V303 工程。
@@ -134,7 +134,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
    - `rt_snprintf` 由内核提供，无需 newlib；未启用 libc 时也无需开 `RT_USING_LIBC`。
 4. 编译烧录：MounRiver / RT-Thread Studio + WCH-Link（PA13 / PA14 SWD）。
 
-### ⚠️ 必须核对 / 自测的 3 个点
+###  必须核对 / 自测的 3 个点
 
 1. **主频必须 144MHz**：固件按 `DOG_TIM_CLK_HZ = 144MHz` 计算预分频。主频不对，定时器 / 舵机 50Hz、
    串口波特率都会偏。若你的板子主频不是 144MHz，改 `firmware/dog_config.h` 里的 `DOG_TIM_CLK_HZ`
@@ -145,7 +145,7 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
    MounRiver：项目 → Properties → Resource → Text file encoding → GBK。
 
 
-## 🔧 烧录与工具
+## 烧录与工具
 
 | 工具 | 用途 | 位置 |
 |---|---|---|
@@ -184,7 +184,7 @@ riscv64-unknown-elf-gcc -march=rv32imafc -mabi=ilp32f -DCH32V30x_D8 ...
 | 原版 B 站视频 | https://www.bilibili.com/video/BV1UmUfBNEwu |
 | 外壳 3D 打印模型（MakerWorld） | https://makerworld.com.cn/zh/models/1937892-stm32man-bo-ji-qi-ren-wai-ke |
 
-## 📄 第三方版权声明
+##  第三方版权声明
 
 本项目代码以 **MIT License** 发布
 第三方组件保留其各自权利：
