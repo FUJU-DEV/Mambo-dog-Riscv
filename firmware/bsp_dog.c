@@ -27,4 +27,17 @@ void bsp_dog_init(void)
     uart_dog_init();
     OLED_Init();
     led_init();
+
+    /* 时钟自检：晶振未起振 / 器件宏错误（D8 未生效）时主频会静默偏离，
+     * 表现为"能跑但舵机错乱、延时不准"。这里主动快闪 LED 报警。 */
+    if (SystemCoreClock != 144000000UL)
+    {
+        for (;;)
+        {
+            GPIO_ResetBits(LED_PORT, LED_PIN);
+            rt_thread_mdelay(80);
+            GPIO_SetBits(LED_PORT, LED_PIN);
+            rt_thread_mdelay(80);
+        }
+    }
 }

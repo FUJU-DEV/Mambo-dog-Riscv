@@ -169,7 +169,8 @@ PA13=34、VSS=35、VDD=36、PA14=37、PA15=38、PB3=39…PB7=43、BOOT0=44、PB8
    （舵机频率必须保持 50Hz，否则会抖、发热）。
 2. **OLED 地址**：默认 0x78（`OLED.c` 内 `OLED_WriteCommand` / `OLED_WriteData` 里写死）。
    若你的屏是 0x7A / 0x3C，改那两处。
-3. **中文编码**：`dog_mode.c` 必须保存为 GBK/GB2312（已按 GBK 写好），否则注释乱码。
+3. **屏幕型号**：`OLED.c` 顶部 `OLED_IS_130`：1 = 1.3" SH1106（132 列，起始列 +2），0 = 0.96" SSD1306（128 列）。型号填错会整体右偏/裁边。
+4. **中文编码**：`dog_mode.c` 必须保存为 GBK/GB2312（已按 GBK 写好），否则注释乱码。
    MounRiver：项目 → Properties → Resource → Text file encoding → GBK。
    > GitHub 网页上看到 `dog_mode.c` 中文注释乱码是**正常现象**（文件按 GBK 存储，网页按 UTF-8 显示），
    > 不影响编译；按上面设置 GBK 编码即可正常打开。

@@ -8,6 +8,11 @@
 
 #include "ch32v30x.h"
 
+/* Screen: 1 = 1.3" SH1106 (132 cols, start +2); 0 = 0.96" SSD1306 (128 cols) */
+#ifndef OLED_IS_130
+#define OLED_IS_130 1
+#endif
+
 static void oled_dly(void){volatile uint32_t _i;for(_i=0;_i<32;_i++){}}
 #include "OLED.h"
 #include <string.h>
@@ -299,7 +304,9 @@ void OLED_SetCursor(uint8_t Page, uint8_t X)
 	/*因为1.3寸的OLED驱动芯片（SH1106）有132列*/
 	/*屏幕的起始列接在了第2列，而不是第0列*/
 	/*所以需要将X加2，才能正常显示*/
+	#if OLED_IS_130
 	X += 2;
+	#endif
 	
 	/*通过指令设置页地址和列地址*/
 	OLED_WriteCommand(0xB0 | Page);					//设置页位置

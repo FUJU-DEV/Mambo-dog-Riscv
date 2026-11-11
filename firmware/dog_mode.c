@@ -268,6 +268,9 @@ void dog_boot(void)
 /* ---------------- 命令分发 ---------------- */
 void dog_dispatch(char cmd)
 {
+
+    /* ASRPRO frame tail/filter: ignore \r, \n and space */
+    if (cmd == '\r' || cmd == '\n' || cmd == ' ') return;
     /* 体力耗尽：只接受睡觉 */
     if (g_stamina <= 0) {
         if (cmd == '2') { g_cmd = cmd; mode_sleepwo(); }

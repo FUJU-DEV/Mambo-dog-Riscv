@@ -4,6 +4,11 @@
 #include <rtthread.h>
 #include "dog_config.h"
 
+/* 动作时序依赖 1ms tick：RT_TICK_PER_SECOND 必须是 1000 */
+#if RT_TICK_PER_SECOND != 1000
+#error "RT_TICK_PER_SECOND 必须为 1000（动作时序/步态精度依赖 1ms tick）"
+#endif
+
 /* ---- 全局状态 ---- */
 extern int         g_happiness;
 extern int         g_stamina;
